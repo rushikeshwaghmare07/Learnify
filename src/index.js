@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./db/index");
+const cookieParser = require("cookie-parser");
 
 const userRoute = require("./routes/user.routes");
 const adminRoute = require("./routes/admin.routes");
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 3000;
 
 // middleware
 app.use(express.json());
+app.use(cookieParser());
 
 // routes
 app.use("/api/v1/user", userRoute);
