@@ -64,7 +64,7 @@ const adminSignin = async (req, res) => {
       });
     }
 
-    const isPasswordValid = await adminModel.comparePassword(password);
+    const isPasswordValid = await admin.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
@@ -80,10 +80,16 @@ const adminSignin = async (req, res) => {
       { expiresIn: process.env.JWT_TOKEN_EXPIRY }
     );
 
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    }
+
+    res.cookie("token", token, options);
+
     return res.status(200).json({
       success: false,
       message: "Admin logged in successfully.",
-      token: token,
       admin: admin,
     });
   } catch (error) {

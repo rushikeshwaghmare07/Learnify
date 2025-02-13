@@ -68,7 +68,7 @@ const userSignin = async (req, res) => {
       });
     }
 
-    const isPasswordValid = await userModel.comparePassword(password);
+    const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
@@ -84,10 +84,16 @@ const userSignin = async (req, res) => {
       { expiresIn: process.env.JWT_TOKEN_EXPIRY }
     );
 
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    };
+
+    res.cookie("token", token, options);
+
     return res.status(200).json({
       success: false,
       message: "User logged in successfully.",
-      token: token,
       user: user,
     });
   } catch (error) {
