@@ -45,6 +45,58 @@ const adminSignup = async (req, res) => {
   }
 };
 
+const adminSignin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required.",
+      });
+    }
+
+    const admin = await adminModel.findOne({ email });
+    if (!admin) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials.",
+      });
+    }
+
+    const isPasswordValid = await adminModel.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials.",
+      });
+    }
+
+    const token = await jwt.sign(
+      {
+        id: admin._id,
+      },
+      process.env.JWT_SECRET_ADMIN,
+      { expiresIn: process.env.JWT_TOKEN_EXPIRY }
+    );
+
+    return res.status(200).json({
+      success: false,
+      message: "Admin logged in successfully.",
+      token: token,
+      admin: admin,
+    });
+  } catch (error) {
+    console.log("Error in adminSignup controller", error);
+    return res.status(500).json({
+      success: false,
+      message:
+        error.message || "Something went wrong while registering the admin.",
+    });
+  }
+};
+
 module.exports = {
   adminSignup,
-}
+  adminSignin,
+};
