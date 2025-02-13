@@ -3,6 +3,7 @@ const express = require("express");
 const connectDB = require("./db/index");
 
 const userRoute = require("./routes/user.routes");
+const adminRoute = require("./routes/admin.routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // routes
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/admin", adminRoute);
 
 connectDB()
   .then(() => {
