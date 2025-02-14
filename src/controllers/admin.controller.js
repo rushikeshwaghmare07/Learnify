@@ -1,5 +1,7 @@
 const adminModel = require("../models/admin.model");
+const courseModel = require("../models/course.model");
 const { adminSignupSchema } = require("../validations/admin.validation");
+const { courseValidationSchema } = require("../validations/course.validation");
 const jwt = require("jsonwebtoken");
 
 const adminSignup = async (req, res) => {
@@ -14,6 +16,7 @@ const adminSignup = async (req, res) => {
     }
 
     const { firstName, lastName, email, password } = parsedBody.data;
+    console.log(firstName)
 
     const existingAdmin = await adminModel.findOne({ email });
     if (existingAdmin) {
@@ -83,7 +86,7 @@ const adminSignin = async (req, res) => {
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-    }
+    };
 
     res.cookie("token", token, options);
 
@@ -102,7 +105,45 @@ const adminSignin = async (req, res) => {
   }
 };
 
+const createCourse = async (req, res) => {
+  try {
+    const adminId = req.adminId;
+    const parsedBody = courseValidationSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: parsedBody.error.errors,
+      });
+    }
+
+    const { title, description, imageUrl, price } = parsedBody.data;
+
+    const course = await courseModel.create({
+      title,
+      description,
+      imageUrl,
+      price,
+      creatorId: adminId,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Course created successfully.",
+      courseId: course._id,
+    });
+  } catch (error) {
+    console.log("Error in createCourse controller", error);
+    return res.status(500).json({
+      success: false,
+      message:
+        error.message || "Something went wrong while creating the course.",
+    });
+  }
+};
+
 module.exports = {
   adminSignup,
   adminSignin,
+  createCourse,
 };
