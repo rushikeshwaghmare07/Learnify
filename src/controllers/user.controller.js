@@ -1,3 +1,4 @@
+const purchaseModel = require("../models/purchase.model");
 const userModel = require("../models/user.model");
 const { userSignupSchema } = require("../validations/user.validation");
 const jwt = require("jsonwebtoken");
@@ -106,7 +107,35 @@ const userSignin = async (req, res) => {
   }
 };
 
+const allPurchases = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const courses = await purchaseModel.find({ userId });
+    if (!courses) {
+      return res.status(404).json({
+        success: false,
+        message: "No courses found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "All purchased courses retrieved successfully.",
+      courses: courses,
+    });
+  } catch (error) {
+    console.log("Error in userSignup controller", error);
+    return res.status(500).json({
+      success: false,
+      message:
+        error.message || "Something went wrong while registering the user.",
+    });
+  }
+};
+
 module.exports = {
   userSignup,
   userSignin,
+  allPurchases,
 };
