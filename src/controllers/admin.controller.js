@@ -1,7 +1,7 @@
 const adminModel = require("../models/admin.model");
 const courseModel = require("../models/course.model");
 const { adminSignupSchema } = require("../validations/admin.validation");
-const { courseValidationSchema } = require("../validations/course.validation");
+const { courseValidationSchema, updateCourseValidationSchema } = require("../validations/course.validation");
 const jwt = require("jsonwebtoken");
 
 const adminSignup = async (req, res) => {
@@ -16,7 +16,7 @@ const adminSignup = async (req, res) => {
     }
 
     const { firstName, lastName, email, password } = parsedBody.data;
-    console.log(firstName)
+    console.log(firstName);
 
     const existingAdmin = await adminModel.findOne({ email });
     if (existingAdmin) {
@@ -142,8 +142,55 @@ const createCourse = async (req, res) => {
   }
 };
 
+const updateCourse = async (req, res) => {
+  try {
+    const adminId = req.adminId;
+
+    // Validate request body
+    const parsedBody = updateCourseValidationSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        error: parsedBody.error.format(),
+      });
+    }
+
+    const { courseId, title, description, imageUrl, price } = parsedBody.data;
+
+    // Find and update the course
+    const course = await courseModel.findOneAndUpdate(
+      { _id: courseId, creatorId: adminId },
+      { title, description, imageUrl, price },
+      { new: true }
+    );
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found or you're not authorized to update it.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Course updated successfully.",
+      course,
+    });
+  } catch (error) {
+    console.log("Error in updateCourse controller", error);
+    return res.status(500).json({
+      success: false,
+      message:
+        error.message || "Something went wrong while updating the course.",
+    });
+  }
+};
+
+
 module.exports = {
   adminSignup,
   adminSignin,
   createCourse,
+  updateCourse,
 };
