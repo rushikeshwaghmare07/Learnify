@@ -5,6 +5,6 @@ const userAuth = require("../middlewares/user.middleware");
 const router = express.Router();
 
 router.post("/purchase", userAuth, purchaseCourse);
-router.post("/preview", previewCourse);
+router.get("/preview", previewCourse);
 
 module.exports = router;
