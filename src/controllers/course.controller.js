@@ -1,4 +1,5 @@
 const purchaseModel = require("../models/purchase.model");
+const courseModel = require("../models/course.model");
 
 const purchaseCourse = async (req, res) => {
   try {
@@ -41,6 +42,34 @@ const purchaseCourse = async (req, res) => {
   }
 };
 
+const previewCourse = async (req, res) => {
+  try {
+    const courses = await courseModel.find({});
+
+    if (!courses) {
+      return res.status(400).json({
+        success: false,
+        message: "There is no courses available right now...",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Courses retrieved successfully.",
+      courses: courses,
+    });
+  } catch (error) {
+    console.log("Error in purchaseCourse controller", error);
+    return res.status(500).json({
+      success: false,
+      message:
+        error.message ||
+        "An unexpected error occurred while purchasing the courses. Please try again later.",
+    });
+  }
+};
+
 module.exports = {
   purchaseCourse,
-}
+  previewCourse,
+};
