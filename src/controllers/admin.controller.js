@@ -1,7 +1,10 @@
 const adminModel = require("../models/admin.model");
 const courseModel = require("../models/course.model");
 const { adminSignupSchema } = require("../validations/admin.validation");
-const { courseValidationSchema, updateCourseValidationSchema } = require("../validations/course.validation");
+const {
+  courseValidationSchema,
+  updateCourseValidationSchema,
+} = require("../validations/course.validation");
 const jwt = require("jsonwebtoken");
 
 const adminSignup = async (req, res) => {
@@ -187,10 +190,38 @@ const updateCourse = async (req, res) => {
   }
 };
 
+const getAllCourses = async (req, res) => {
+  try {
+    const adminId = req.adminId;
+
+    const courses = await courseModel.find({ creatorId: adminId });
+
+    if (!courses || courses.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No courses found for this admin. Start by creating one!",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Successfully retrieved ${courses.length} courses.`,
+      courses,
+    });
+  } catch (error) {
+    console.log("Error in getAllCourses controller", error);
+    return res.status(500).json({
+      success: false,
+      message:
+      error.message || "An unexpected error occurred while retrieving the courses. Please try again later.",
+    });
+  }
+};
 
 module.exports = {
   adminSignup,
   adminSignin,
   createCourse,
   updateCourse,
+  getAllCourses,
 };
