@@ -59,12 +59,12 @@ const previewCourse = async (req, res) => {
       courses: courses,
     });
   } catch (error) {
-    console.log("Error in purchaseCourse controller", error);
+    console.log("Error in previewCourse controller", error);
     return res.status(500).json({
       success: false,
       message:
         error.message ||
-        "An unexpected error occurred while purchasing the courses. Please try again later.",
+        "An unexpected error occurred while retrieve the courses. Please try again later.",
     });
   }
 };
