@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 
 const userRoute = require("./routes/user.routes");
 const adminRoute = require("./routes/admin.routes");
+const courseRoute = require("./routes/course.routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,6 +17,7 @@ app.use(cookieParser());
 // routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/admin", adminRoute);
+app.use("/api/v1/course", courseRoute);
 
 connectDB()
   .then(() => {
